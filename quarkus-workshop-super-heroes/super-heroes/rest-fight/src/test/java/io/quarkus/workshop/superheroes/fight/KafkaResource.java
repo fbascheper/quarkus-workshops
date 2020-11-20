@@ -2,13 +2,14 @@ package io.quarkus.workshop.superheroes.fight;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.Collections;
 import java.util.Map;
 
 public class KafkaResource implements QuarkusTestResourceLifecycleManager  {
 
-    private static final KafkaContainer KAFKA = new KafkaContainer();
+    private static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:5.4.3"));
 
 
     @Override

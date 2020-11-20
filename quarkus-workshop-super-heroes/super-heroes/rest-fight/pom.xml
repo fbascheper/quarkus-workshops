@@ -26,7 +26,7 @@
 
     <properties>
         <quarkus.version>1.9.2.Final</quarkus.version>
-        <surefire-plugin.version>2.22.0</surefire-plugin.version>
+        <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
@@ -137,16 +137,12 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-health</artifactId>
-        </dependency>
         <!-- tag::banner[] -->
-        <dependency>
+        <!-- dependency>
             <groupId>io.quarkus.workshop.super-heroes</groupId>
             <artifactId>extension-banner</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency -->
         <!-- end::banner[] -->
     </dependencies>
 
