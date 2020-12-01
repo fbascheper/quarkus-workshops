@@ -1,0 +1,124 @@
+---
+scenarioName: "Enact a fight between a Hero and a Villain"
+steps:
+  # ---------------------------------------------------------------
+  # PREPARE test - Consume existing fights from Topic
+  #              - Get Villain to fight (Air Walker)
+  #              - Get Hero    to fight (Peter Petrelli)
+  # ---------------------------------------------------------------
+
+  # Prepare step 1. Consume existing fights from Kafka Topic
+  - name: consume-emitted-fights-event
+    url: "kafka-topic:fights"
+    operation: consume
+    request:
+      consumerLocalConfigs:
+        recordType: "JSON"
+    verify:
+      size: $GT.-1
+
+  # Prepare step 2. Get villain by name
+  - name: get-villain-air-walker
+    url: "${SYSTEM.PROPERTY:villain.api.url}/api/villains/name/Air-Walker"
+    method: GET
+    request:
+      headers:
+        Content-Type: application/json
+    verify:
+      status: 200
+      body:
+        id: "$NOT.NULL"
+    verifyMode: LENIENT
+
+  # Prepare step 3. Get hero by name
+  - name: get-hero-peter-petrelli
+    url: "${SYSTEM.PROPERTY:hero.api.url}/api/heroes/name/Peter%20Petrelli"
+    method: GET
+    request:
+      headers:
+        Content-Type: application/json
+    verify:
+      status: 200
+      body:
+        id: "$NOT.NULL"
+    verifyMode: LENIENT
+
+
+  # ---------------------------------------------------------------
+  # EXECUTE test - Enact fight hero vs villain
+  # ---------------------------------------------------------------
+
+  # Scenario step 1. Enact fight hero vs villain
+  - name: fight-hero-vs-villain
+    url: "${SYSTEM.PROPERTY:fight.api.url}/api/fights"
+    method: POST
+    request:
+      headers:
+        Content-Type: application/json
+      body:
+        hero:
+          level: ${$.get-hero-peter-petrelli.response.body.level}
+          name: ${$.get-hero-peter-petrelli.response.body.name}
+          picture: ${$.get-hero-peter-petrelli.response.body.picture}
+          powers: ${$.get-hero-peter-petrelli.response.body.powers}
+        villain:
+          level: ${$.get-villain-air-walker.response.body.level}
+          name: ${$.get-villain-air-walker.response.body.name}
+          picture: ${$.get-villain-air-walker.response.body.picture}
+          powers: ${$.get-villain-air-walker.response.body.powers}
+    verify:
+      status: 200
+      body:
+        winnerTeam: "heroes"
+        loserTeam: "villains"
+    verifyMode: LENIENT
+
+  # Scenario step 2. Give Kafka topic some time to ensure reproducibility
+  - name: wait-for-async-process
+    url: com.github.fbascheper.quarkus.zerocode.extension.step.AwaitMillisTestStepExecutor
+    operation: execute
+    request: 100
+    verify: true
+
+  # ---------------------------------------------------------------
+  # VERIFY test - Assert that fights event has been emitted
+  #             - Assert that fights DB has been updated
+  # ---------------------------------------------------------------
+
+  # Verify step 1. Assert that fights event has been emitted
+  - name: consume-emitted-fights-event
+    url: "kafka-topic:fights"
+    operation: consume
+    request:
+      consumerLocalConfigs:
+        recordType: "JSON"
+    verify:
+      size: 1
+      records:
+        - key: $IS.NULL
+          value:
+#           This is actually frustrating .. The test below FAILS
+#           id: ${$.fight-hero-vs-villain.response.body.id}
+            id: $EQ.${$.fight-hero-vs-villain.response.body.id}
+            fightDate: ${$.fight-hero-vs-villain.response.body.fightDate}
+            loserLevel: $EQ.${$.fight-hero-vs-villain.response.body.loserLevel}
+            loserName: ${$.fight-hero-vs-villain.response.body.loserName}
+            winnerTeam: ${$.fight-hero-vs-villain.response.body.winnerTeam}
+
+
+  # Verify step 2. Assert that fights DB has been updated
+  - name: verify-fights-db-updated
+    url: com.github.fbascheper.quarkus.zerocode.extension.step.sql.FightSqlTestStepExecutor
+    operation: execute
+    request:
+      query: "select id, fightDate, loserName, winnerName, loserLevel, winnerLevel from fight where id = CAST(:fight_id AS INTEGER)"
+      params:
+        fight_id: ${$.fight-hero-vs-villain.response.body.id}
+    verify:
+      rows.SIZE: 1
+      rows:
+        - ID: $EQ.${$.fight-hero-vs-villain.response.body.id}
+          WINNERNAME: ${$.fight-hero-vs-villain.response.body.winnerName}
+          LOSERNAME: ${$.fight-hero-vs-villain.response.body.loserName}
+
+

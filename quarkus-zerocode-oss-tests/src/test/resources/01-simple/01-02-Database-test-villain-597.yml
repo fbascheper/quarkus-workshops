@@ -1,0 +1,46 @@
+---
+scenarioName: "Simple ZeroCode test 2 - A REST call from the VillainResource AND custom SQL step"
+steps:
+  # ---------------------------------------------------------------
+  # PREPARE test - Get Villain by Name (Ace)
+  # ---------------------------------------------------------------
+
+  # Prepare step 1. Get villain by name
+  - name: get-villain-ace
+    url: "${SYSTEM.PROPERTY:villain.api.url}/api/villains/name/Ace"
+    method: GET
+    request:
+      headers:
+        Content-Type: application/json
+    verify:
+      status: 200
+      body:
+        id: $NOT.NULL
+        name: "Ace"
+    verifyMode: LENIENT
+
+
+  # ---------------------------------------------------------------
+  # EXECUTE test - Verify database contents
+  # ---------------------------------------------------------------
+
+  # Scenario step 1. Verify database contents of villain
+  - name: verify-PGSQL-villain-saved
+    url: com.github.fbascheper.quarkus.zerocode.extension.step.sql.VillainSqlTestStepExecutor
+    operation: execute
+    request:
+      query: "select id, level, name, otherName, picture, powers from villain where id = CAST(:villain_id AS INTEGER)"
+      params:
+        villain_id: ${$.get-villain-ace.response.body.id}
+    verify:
+      rows.SIZE: 1
+      rows:
+        - ID: $EQ.${$.get-villain-ace.response.body.id}
+          LEVEL: $EQ.${$.get-villain-ace.response.body.level}
+          NAME: ${$.get-villain-ace.response.body.name}
+    verifyMode: LENIENT
+
+
+  # ---------------------------------------------------------------
+  # VERIFY test - Not necessary here, verification already in scenario step 1.
+  # ---------------------------------------------------------------

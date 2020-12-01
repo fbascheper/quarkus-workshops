@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.fbascheper.quarkus</groupId>
+    <artifactId>quarkus-zerocode-oss-tests</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+
+    <name>zerocode-test</name>
+    <description>ZeroCode tests for Quarkus workshop</description>
+
+    <properties>
+        <dependencies.zerocode-oss.version>1.3.26</dependencies.zerocode-oss.version>
+
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jsmart</groupId>
+            <artifactId>zerocode-tdd</artifactId>
+            <version>${dependencies.zerocode-oss.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jsmart</groupId>
+            <artifactId>zerocode-tdd-jupiter</artifactId>
+            <version>${dependencies.zerocode-oss.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.10.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.18</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test-integration/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>add-test-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/test-integration/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+
+    <profiles>
+        <profile>
+            <id>stand-alone</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <properties>
+                <corporate.proxy.host />
+                <corporate.proxy.port>80</corporate.proxy.port>
+
+                <kafka.bootstrap.servers>localhost:9092</kafka.bootstrap.servers>
+
+                <jdbc.driver.class>org.postgresql.Driver</jdbc.driver.class>
+
+                <fight.api.url>http://localhost:8082</fight.api.url>
+                <fight.jdbc.url>jdbc:postgresql://localhost:5432/fights_database</fight.jdbc.url>
+                <fight.jdbc.username>superfight</fight.jdbc.username>
+                <fight.jdbc.password>superfight</fight.jdbc.password>
+
+                <hero.api.url>http://localhost:8083</hero.api.url>
+                <hero.jdbc.url>jdbc:postgresql://localhost:5432/heroes_database</hero.jdbc.url>
+                <hero.jdbc.username>superman</hero.jdbc.username>
+                <hero.jdbc.password>superman</hero.jdbc.password>
+
+                <villain.api.url>http://localhost:8084</villain.api.url>
+                <villain.jdbc.url>jdbc:postgresql://localhost:5432/villains_database</villain.jdbc.url>
+                <villain.jdbc.username>superbad</villain.jdbc.username>
+                <villain.jdbc.password>superbad</villain.jdbc.password>
+            </properties>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>3.0.0-M5</version>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <kafka.bootstrap.servers>${kafka.bootstrap.servers}</kafka.bootstrap.servers>
+                                <fight.api.url>${fight.api.url}</fight.api.url>
+                                <hero.api.url>${hero.api.url}</hero.api.url>
+                                <villain.api.url>${villain.api.url}</villain.api.url>
+                                <villain.jdbc.url>${villain.jdbc.url}</villain.jdbc.url>
+                                <villain.jdbc.username>${villain.jdbc.username}</villain.jdbc.username>
+                                <villain.jdbc.password>${villain.jdbc.password}</villain.jdbc.password>
+                            </systemPropertyVariables>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>integration-test</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>verify</id>
+                                <goals>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>com.internetitem</groupId>
+                        <artifactId>write-properties-file-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>save-docker-properties</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>write-properties-file</goal>
+                                </goals>
+                                <configuration>
+                                    <filename>application-host.properties</filename>
+                                    <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                                    <properties>
+                                        <property>
+                                            <name>corporate.proxy.host</name>
+                                            <value>${corporate.proxy.host}</value>
+                                        </property>
+                                        <property>
+                                            <name>corporate.proxy.port</name>
+                                            <value>${corporate.proxy.port}</value>
+                                        </property>
+                                        <property>
+                                            <name>corporate.proxy.username</name>
+                                            <value /><!-- optional -->
+                                        </property>
+                                        <property>
+                                            <name>corporate.proxy.password</name>
+                                            <value /><!-- optional -->
+                                        </property>
+                                        <property>
+                                            <name>web.application.endpoint.host</name>
+                                            <value>${villain.api.url}</value>
+                                        </property>
+                                        <property>
+                                            <name>web.application.endpoint.context</name>
+                                            <value />
+                                        </property>
+                                        <property>
+                                            <name>kafka.bootstrap.servers</name>
+                                            <value>${kafka.bootstrap.servers}</value>
+                                        </property>
+                                        <property>
+                                            <name>kafka.producer.properties</name>
+                                            <value>kafka-servers/kafka-producer.properties</value>
+                                        </property>
+                                        <property>
+                                            <name>kafka.consumer.properties</name>
+                                            <value>kafka-servers/kafka-consumer.properties</value>
+                                        </property>
+                                        <property>
+                                            <name>http.max.timeout.milliseconds</name>
+                                            <value>10000</value>
+                                        </property>
+                                        <property>
+                                            <name>jdbc.driver.class</name>
+                                            <value>${jdbc.driver.class}</value>
+                                        </property>
+
+                                        <property>
+                                            <name>fight.jdbc.url</name>
+                                            <value>${fight.jdbc.url}</value>
+                                        </property>
+                                        <property>
+                                            <name>fight.jdbc.username</name>
+                                            <value>${fight.jdbc.username}</value>
+                                        </property>
+                                        <property>
+                                            <name>fight.jdbc.password</name>
+                                            <value>${fight.jdbc.password}</value>
+                                        </property>
+                                        <property>
+                                            <name>hero.jdbc.url</name>
+                                            <value>${hero.jdbc.url}</value>
+                                        </property>
+                                        <property>
+                                            <name>hero.jdbc.username</name>
+                                            <value>${hero.jdbc.username}</value>
+                                        </property>
+                                        <property>
+                                            <name>hero.jdbc.password</name>
+                                            <value>${hero.jdbc.password}</value>
+                                        </property>
+                                        <property>
+                                            <name>villain.jdbc.url</name>
+                                            <value>${villain.jdbc.url}</value>
+                                        </property>
+                                        <property>
+                                            <name>villain.jdbc.username</name>
+                                            <value>${villain.jdbc.username}</value>
+                                        </property>
+                                        <property>
+                                            <name>villain.jdbc.password</name>
+                                            <value>${villain.jdbc.password}</value>
+                                        </property>
+
+                                        <property>
+                                            <name>consumer.commitSync</name>
+                                            <value>true</value>
+                                        </property>
+                                        <property>
+                                            <name>consumer.commitAsync</name>
+                                            <value>false</value>
+                                        </property>
+                                        <property>
+                                            <name>consumer.fileDumpTo</name>
+                                            <value>${project.build.directory}/logs/kafka-consumed-records.txt</value>
+                                        </property>
+                                        <property>
+                                            <name>consumer.showRecordsConsumed</name>
+                                            <value>false</value>
+                                        </property>
+                                        <property>
+                                            <name>consumer.maxNoOfRetryPollsOrTimeouts</name>
+                                            <value>5</value>
+                                        </property>
+                                        <property>
+                                            <name>consumer.pollingTime</name>
+                                            <value>1000</value>
+                                        </property>
+
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
+</project>

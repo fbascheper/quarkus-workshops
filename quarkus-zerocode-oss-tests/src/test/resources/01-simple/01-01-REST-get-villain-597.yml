@@ -1,0 +1,50 @@
+---
+scenarioName: "Simple ZeroCode test 1 - Two related REST calls from the VillainResource"
+steps:
+  # ---------------------------------------------------------------
+  # PREPARE test - Get Villain by Name (Ace)
+  # ---------------------------------------------------------------
+
+  # Prepare step 1. Get villain by name
+  - name: get-villain-ace
+    url: "${SYSTEM.PROPERTY:villain.api.url}/api/villains/name/Ace"
+    method: GET
+    request:
+      headers:
+        Content-Type: application/json
+    verify:
+      status: 200
+      body:
+        id: $NOT.NULL
+        name: Ace
+        otherName: ""
+        picture: "$MATCHES.STRING:https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"
+        powers: $CONTAINS.STRING:Probability Manipulation
+    verifyMode: LENIENT
+
+
+  # ---------------------------------------------------------------
+  # EXECUTE test - Get villain by ID
+  # ---------------------------------------------------------------
+
+  # Scenario step 1. Get villain by id from previous request
+  - name: get-villain-by-id
+    url: "${SYSTEM.PROPERTY:villain.api.url}/api/villains/${$.get-villain-ace.response.body.id}"
+    method: GET
+    request:
+      headers:
+        Content-Type: application/json
+    verify:
+      status: 200
+      body:
+        # Note that $EQ. is necessary here, otherwise the test FAILS
+        # id: ${$.get-villain-ace.response.body.id} # NOPE this doesn't work
+        id: $EQ.${$.get-villain-ace.response.body.id}
+        name: ${$.get-villain-ace.response.body.name}
+        picture: ${$.get-villain-ace.response.body.picture}
+    verifyMode: LENIENT
+
+
+  # ---------------------------------------------------------------
+  # VERIFY test - Not necessary here, verification already in scenario step 1.
+  # ---------------------------------------------------------------
