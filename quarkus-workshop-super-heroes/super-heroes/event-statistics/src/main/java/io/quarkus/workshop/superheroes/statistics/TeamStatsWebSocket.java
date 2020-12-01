@@ -3,7 +3,7 @@ package io.quarkus.workshop.superheroes.statistics;
 
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
-import io.smallrye.reactive.messaging.annotations.Channel;
+import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.jboss.logging.Logger;
 
 import javax.annotation.PostConstruct;

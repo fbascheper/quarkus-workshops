@@ -29,6 +29,11 @@ public class VillainService {
     }
 
     @Transactional(SUPPORTS)
+    public Villain findVillainByName(String name) {
+        return Villain.findByName(name);
+    }
+
+    @Transactional(SUPPORTS)
     public Villain findRandomVillain() {
         Villain randomVillain = null;
         while (randomVillain == null) {

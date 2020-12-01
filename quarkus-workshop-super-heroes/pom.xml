@@ -42,6 +42,7 @@
         <module>super-heroes/rest-hero</module>
         <module>super-heroes/rest-villain</module>
         <module>super-heroes/rest-fight</module>
+        <module>super-heroes/event-statistics</module>
         <module>super-heroes/ui-super-heroes</module>
         <module>super-heroes/load-super-heroes</module>
     </modules>

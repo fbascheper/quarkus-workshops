@@ -34,6 +34,10 @@ public class Villain extends PanacheEntity {
         return findAll().page(randomVillain, 1).firstResult();
     }
 
+    public static Villain findByName(String name){
+        return find("name", name).firstResult();
+    }
+
     // tag::adocSkip[]
     @Override
     public String toString() {

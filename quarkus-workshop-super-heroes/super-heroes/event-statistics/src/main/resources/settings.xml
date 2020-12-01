@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <!-- localRepository
+     | The path to the local repository maven will use to store artifacts.
+     |
+     | Default: ~/.m2/repository
+    <localRepository>/path/to/local/repo</localRepository>
+    -->
+    <localRepository>/Users/esc21191/work/java/maven/repository</localRepository>
+
+    <!-- proxies
+     | This is a list of proxies which can be used on this machine to connect to the network.
+     | Unless otherwise specified (by system property or command-line switch), the first proxy
+     | specification in this list marked as active will be used.
+     |-->
+    <proxies>
+        <!-- proxy
+         | Specification for one proxy, to be used in connecting to the network.
+         |
+        <proxy>
+          <id>optional</id>
+          <active>true</active>
+          <protocol>http</protocol>
+          <username>proxyuser</username>
+          <password>proxypass</password>
+          <host>proxy.host.net</host>
+          <port>80</port>
+          <nonProxyHosts>local.net|some.host.com</nonProxyHosts>
+        </proxy>
+        -->
+    </proxies>
+
+    <!-- servers
+     | This is a list of authentication profiles, keyed by the server-id used within the system.
+     | Authentication profiles can be used whenever maven must make a connection to a remote server.
+     |-->
+    <servers>
+        <server>
+            <id>ossrh</id>
+            <username>eBoldn8C</username>
+            <password>ahTO9wcuXB3wbINA42/ZFosIAP9LY3/7L6SyIq8cLGuh</password>
+        </server>
+        <server>
+            <id>ecodex-public</id>
+            <username>ecodex</username>
+            <password>eCodeX2012</password>
+        </server>
+    </servers>
+
+    <!-- mirrors
+     | This is a list of mirrors to be used in downloading artifacts from remote repositories.
+     |
+     | It works like this: a POM may declare a repository to use in resolving certain artifacts.
+     | However, this repository may have problems with heavy traffic at times, so people have mirrored
+     | it to several places.
+     |
+     | That repository definition will have a unique id, so we can create a mirror reference for that
+     | repository, to be used as an alternate download site. The mirror site will be the preferred
+     | server for that repository.
+     |-->
+    <mirrors>
+        <!-- mirror
+         | Specifies a repository mirror site to use instead of a given repository. The repository that
+         | this mirror serves has an ID that matches the mirrorOf element of this mirror. IDs are used
+         | for inheritance and direct lookup purposes, and must be unique across the set of mirrors.
+         |
+        <mirror>
+          <id>mirrorId</id>
+          <mirrorOf>repositoryId</mirrorOf>
+          <name>Human Readable Name for this Mirror.</name>
+          <url>http://my.repository.com/repo/path</url>
+        </mirror>
+         -->
+    </mirrors>
+
+    <profiles>
+
+        <profile>
+            <id>sonatype</id>
+            <repositories>
+                <repository>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <id>release.sonatype.org</id>
+                    <name>Sonatype OSS release Repository</name>
+                    <url>https://oss.sonatype.org/conte�nt/repositories/releases/</url>
+                </repository>
+                <repository>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <id>snapshot.sonatype.org</id>
+                    <name>Sonatype OSS snapshot Repository</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <id>release.sonatype.org</id>
+                    <name>Sonatype OSS release Repository</name>
+                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <id>snapshot.sonatype.org</id>
+                    <name>Sonatype OSS snapshot Repository</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+
+
+        <profile>
+            <id>ecodex</id>
+            <properties>
+                <docker.buildArg.http_proxy/>
+                <docker.buildArg.https_proxy/>
+                <docker.buildArg.https_no_proxy/>
+                <docker.host.name/>
+                <docker.host.url/>
+                <docker.showLogs>true</docker.showLogs>
+                <docker.logStdout>true</docker.logStdout>
+                <docker.verbose>true</docker.verbose>
+                <ecodex-releases-repo.url>https://secure.e-codex.eu/nexus/content/groups/public
+                </ecodex-releases-repo.url>
+            </properties>
+
+            <repositories>
+                <repository>
+                    <id>ecodex-public</id>
+                    <name>Nexus public</name>
+                    <url>${ecodex-releases-repo.url}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+
+
+    <activeProfiles>
+        <activeProfile>sonatype</activeProfile>
+    </activeProfiles>
+</settings>

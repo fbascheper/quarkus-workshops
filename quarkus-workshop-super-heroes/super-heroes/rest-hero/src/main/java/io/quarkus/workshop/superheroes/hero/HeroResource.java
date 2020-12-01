@@ -98,6 +98,20 @@ public class HeroResource {
         }
     }
 
+    @GET
+    @Path("/name/{name}")
+    public Response getHero(@Parameter(description = "Hero name", required = true) @PathParam("name") String name) {
+        Hero hero = service.findHeroByName(name);
+        if (hero != null) {
+            LOGGER.debug("Found hero " + hero);
+            return Response.ok(hero).build();
+        } else {
+            LOGGER.debug("No hero found with name " + name);
+            return Response.noContent().build();
+        }
+    }
+
+
     // tag::adocOpenAPI[]
     @Operation(summary = "Creates a valid hero")
     @APIResponse(responseCode = "201", description = "The URI of the created hero", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = URI.class)))

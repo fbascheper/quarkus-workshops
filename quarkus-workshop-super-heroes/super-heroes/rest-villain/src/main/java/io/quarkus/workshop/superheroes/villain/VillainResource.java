@@ -92,6 +92,19 @@ public class VillainResource {
         }
     }
 
+    @GET
+    @Path("/name/{name}")
+    public Response getVillain(@Parameter(description = "Villain name", required = true) @PathParam("name") String name) {
+        Villain villain = service.findVillainByName(name);
+        if (villain != null) {
+            LOGGER.debug("Found villain " + villain);
+            return Response.ok(villain).build();
+        } else {
+            LOGGER.debug("No villain found with name " + name);
+            return Response.noContent().build();
+        }
+    }
+
     @Operation(summary = "Creates a valid villain")
     @APIResponse(responseCode = "201", description = "The URI of the created villain", content = @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = URI.class)))
     // tag::adocMetrics[]

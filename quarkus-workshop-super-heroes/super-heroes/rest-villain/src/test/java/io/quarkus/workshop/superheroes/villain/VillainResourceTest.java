@@ -182,6 +182,19 @@ public class VillainResourceTest {
             .body("picture", Is.is(DEFAULT_PICTURE))
             .body("powers", Is.is(DEFAULT_POWERS));
 
+        given()
+            .pathParam("name", DEFAULT_NAME)
+            .when().get("/api/villains/name/{name}")
+            .then()
+            .statusCode(OK.getStatusCode())
+            .header(CONTENT_TYPE, APPLICATION_JSON)
+            .body("id", Is.is(Integer.valueOf(villainId)))
+            .body("name", Is.is(DEFAULT_NAME))
+            .body("otherName", Is.is(DEFAULT_OTHER_NAME))
+            .body("level", Is.is(DEFAULT_LEVEL))
+            .body("picture", Is.is(DEFAULT_PICTURE))
+            .body("powers", Is.is(DEFAULT_POWERS));
+
         List<Villain> villains = get("/api/villains").then()
             .statusCode(OK.getStatusCode())
             .header(CONTENT_TYPE, APPLICATION_JSON)

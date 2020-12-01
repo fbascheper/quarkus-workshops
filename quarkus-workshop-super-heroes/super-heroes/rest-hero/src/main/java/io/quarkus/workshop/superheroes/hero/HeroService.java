@@ -32,6 +32,11 @@ public class HeroService {
     }
 
     @Transactional(SUPPORTS)
+    public Hero findHeroByName(String name) {
+        return Hero.findByName(name);
+    }
+
+    @Transactional(SUPPORTS)
     public Hero findRandomHero() {
         Hero randomHero = null;
         while (randomHero == null) {
